@@ -260,7 +260,7 @@ shinyServer(function(input, output, session) {
 
     output$download <- downloadHandler(
       filename = function() {
-        paste("test plot", ".png", sep = "")
+        paste("plot", ".png", sep = "")
       },
       content = function(file) {
         ggsave(file,  render.plot())
