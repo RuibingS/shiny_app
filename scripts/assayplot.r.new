@@ -1,0 +1,59 @@
+# ################################################## cplot.r
+
+#' Dependencies: > library('ggplot2') must be imported!
+#' Dependencies: > library('scales') must be imported!
+
+#' windows() unter MS Windows
+#' quartz() unter osX
+#' x11() unter Linux
+
+
+
+################# HIER 
+
+cplot.base <- function(p.data) {
+    base <- ggplot(p.data)
+    + theme_minimal()
+   return(base)
+}##########################
+
+cplot.layer.gridX <- function() {
+  layer <- scale_x_continuous(name = "concentration", labels = math_format(10^.x)) 
+  return(layer)
+}
+
+cplot.layer.data <- function(p.data) {
+    layer <- geom_point(data = p.data, aes(x = concentration, y = value), stat = "identity", colour = "darkgray")
+    return(layer)
+}
+
+cplot.layer.point <- function(p.data, symbol = NULL) {
+    layer <- geom_point(data = p.data, aes(x = concentration, y = value), stat = "identity", colour = "black", fill = "black", shape = symbol, size = 2)
+    return(layer)
+}
+
+# cplot.layer.sd <- function(p.data) {
+#   layer <- geom_errorbar(data = p.data, aes(x = concentration, y = value, ymin = value - sd, ymax = value + sd), colour = "red", width = 0.25)
+#   return(layer)
+# }
+cplot.layer.sd <- function(p.data) {
+  #smaller error bars by raimo
+  layer <- geom_errorbar(data = p.data, aes(x = concentration, y = value, ymin = value - sd, ymax = value + sd), colour = "black", width = 0.08)
+  return(layer)
+}
+cplot.layer.sdp <- function(p.data) {
+  layer <- geom_point(data = p.data, aes(x = concentration, y = value), stat = "identity", colour = "red")
+  return(layer)
+}
+
+cplot.layer.model <- function(p.data, fun = NULL, args = NULL) {
+    layer <- geom_path(data = p.data, aes(x = concentration, y = value), colour = "blue", stat = "function", fun = fun, args = args)
+    return(layer)
+}
+
+cplot.layer.conf <- function(p.data) {
+    layer <- geom_ribbon(data = p.data, aes(x = concentration, ymin = value_l, ymax = value_u), colour = "darkgray", alpha = 0.25)
+    return(layer)
+}
+
+# ################################################## End of Document

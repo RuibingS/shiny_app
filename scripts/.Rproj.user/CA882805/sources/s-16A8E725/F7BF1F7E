@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1625404213458.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "307391799",
+    "id" : "F7BF1F7E",
+    "lastKnownWriteTime" : 1625428111,
+    "last_content_update" : 1625428111961,
+    "path" : "~/Downloads/r_shiny/ruibing_shiny/scripts/ui.r",
+    "project_path" : "ui.r",
+    "properties" : {
+        "cursorPosition" : "167,64",
+        "scrollLine" : "163"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
