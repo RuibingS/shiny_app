@@ -63,14 +63,14 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                     accept = c("text/csv","text/comma-separated-values,text/plain",".csv")),
                           tags$hr(),
                           
-                       #   selectInput(
-                       #     inputId = "dataset",
-                      #      label = "Data set:",
-                       #     data.list("../db"), 
-                      #      #data.list("../db"),
-                      #      multiple = FALSE,
-                      #      selectize = TRUE
-                      #    ),
+                     #     selectInput(
+                    #        inputId = "dataset",
+                    #        label = "Data set:",
+                    #       data.list("../database"), 
+                    #        #data.list("../db"),
+                    #        multiple = FALSE,
+                    #        selectize = TRUE
+                    #      ),
                           selectInput(
                             inputId = "compound",
                             label = "Compound:",
@@ -205,12 +205,14 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                             label = "Name blank compound (if available):",
                             value = "BLANK"
                           ),
-                          fileInput(
+                            fileInput(
                             inputId = "file",
                             label = "Choose spreadsheet file:",
                             accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet "
                           ),
-                          #actionButton("upload", "Upload"),
+                          #br(),
+                         
+                          actionButton("upload", "Upload"),
                           tags$hr(),
                           selectInput(
                             inputId = "inspect",

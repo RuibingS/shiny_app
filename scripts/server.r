@@ -2,30 +2,41 @@ library(shiny)
 
 shinyServer(function(input, output, session) {
   
-  df <- reactive({
+  df<- reactive({
     req(input$file1)
     read.table(input$file1$datapath,sep = ",", header = TRUE)
    
     })
-  #' load and process data
-  #' load and process data
-  get.dat <- reactive({
+  get.dat<-reactive({
     dataset <- df()
-    compound <- input$compound
+    compound.input <- input$compound
     sub_blank <- input$sub_blank
-    
+    if(dataset == "" || compound.input == "") {
+      return(NULL)
+    } else {
+      #dataset <- df()
+      compound <- input$compound
       dat <- df()
-      blank <- subset(dat,is.na(concentration))
-      blank <- blank$value
+      dat<-na.omit(dat)
+      dat <- subset(dat,is.finite(concentration))
+      blank <- subset(dat,tolower(dat$compound)=="blank")
+      blank.val <- blank$value
       if(sub_blank && length(blank) > 0){
-        blank <- mean(blank)
-        dat$value <- dat$value - blank
+        blank.mean <- mean(blank.val)
+        dat$value <- dat$value - blank.mean
       }
-      dat <- dat[dat$compound %in% compound,]
-      dat <- subset(dat, is.finite(concentration))
+      dat <- dat[dat$compound %in% compound.input,]
+      dat$compound<-tolower(dat$compound)
       return(dat)
-    
+
+    }
   })
+ 
+  #' load and process data
+  #' load and process data
+ 
+
+ 
   #' set or calculate model
   get.mod <- reactive({
     dat <- get.dat()
@@ -198,7 +209,7 @@ shinyServer(function(input, output, session) {
     
     summary <- list(data=c(),model=c(),parameters=c(),concentration=c(),settings=c())
     
-    summary$data <- c(df(), input$compound)
+    summary$data <- c(get.dat(), input$compound)
     names(summary$data) <- c("dataset","compound")
     
     summary$settings <- c(input$model,input$method,input$sub_blank)
@@ -225,8 +236,16 @@ shinyServer(function(input, output, session) {
     return(summary)
   })
   
+
+  dat_save<-eventReactive(input$upload, {
+      runif(input$file)
+      data.save("../database",
+              paste(input$filename, "dat", sep = "."),
+              data.extract(input$file$datapath))
+    })
   
   observe({
+  
     comp <- as.vector(unique(df()$"compound"))
     updateSelectInput(session, "compound",
                       choices = comp[!is.na(comp)])
@@ -239,22 +258,40 @@ shinyServer(function(input, output, session) {
     })
   
   observe({
-  output$show <-renderDataTable(isolate(data.load("../db", input$inspect))) #, options = list(paging = TRUE, searching = FALSE)
+  output$show <-renderDataTable(isolate(data.load("../db", input$inspect)), options = list(paging = TRUE, searching = FALSE)) #, options = list(paging = TRUE, searching = FALSE)
   })
   
+#  observe({
+#    if(input$upload>0){
+#      if (is.null(input$file) || is.null(input$filename)) {
+#         return()
+#       } else{
+#       data.save()
+     # updateSelectInput(session, "dataset", choices = data.list("../database"))
+      #updateSelectInput(session, "inspect",
+      #                  choices = data.list("../db"))
+      
+#          }
+#    }
+#  })
+  
+  
   observe({
-    if (is.null(input$file) || is.null(input$filename)) {
-      return()
-    } else{
-      data.save("../db",
-                paste(input$filename, "dat", sep = "."),
-                data.extract(input$file$datapath))
-      updateSelectInput(session, "dataset",
-                        choices = data.list("../db"))
-      updateSelectInput(session, "inspect",
-                        choices = data.list("../db"))
-    }
+    
+      if (is.null(input$file) || is.null(input$filename)) {
+        return()
+      } else{
+       
+        dat_save()
+    
+            
+      
+        
+      }
+    
   })
+  
+  
   
   observe({
 
@@ -263,7 +300,7 @@ shinyServer(function(input, output, session) {
         paste("plot", ".png", sep = "")
       },
       content = function(file) {
-        ggsave(file,  render.plot())
+        ggsave(file,render.plot())
 
 
       })
