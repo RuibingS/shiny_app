@@ -1,8 +1,22 @@
+## First specify the packages of interest
+packages = c("shiny", "ggplot2",
+             "scales", "tidyverse","readxl")
+
+## Now load or install&load all
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
 
 
-library(shiny)
-library(ggplot2)
-library(scales)
+#library(shiny)
+#library(ggplot2)
+#library(scales)
 
 #setwd("/srv/shiny-server/r_workspace_191216/scripts")
 #setwd("/home/rsh19/Downloads/r_shiny/r_workspace/scripts")

@@ -1,20 +1,23 @@
 # ################################################## data.r
 
 data.extract <- function(fpath) {
-    wb <- XLConnect::loadWorkbook(fpath)
+   # wb <- #XLConnect::loadWorkbook(fpath)
     
-    value <- XLConnect::readWorksheet(object = wb, sheet = 1, header = FALSE, simplify = TRUE)
-    concentration <- XLConnect::readWorksheet(object = wb, sheet = 2, header = FALSE, simplify = TRUE)
-    compound <- XLConnect::readWorksheet(object = wb, sheet = 3, header = FALSE, simplify = TRUE)
+    value.xls <- read_excel(path = fpath, sheet = 1, skip = 0,col_names=F,.name_repair = "minimal")
+    concentration.xls <- read_excel(path = fpath, sheet = 2, skip = 0,col_names=F,.name_repair = "minimal")
+    compound.xls <- read_excel(path = fpath, sheet = 3, skip = 0,col_names=F,.name_repair = "minimal")
+    names(value.xls) <- NULL
+    names(concentration.xls) <- NULL
+    names(compound.xls) <- NULL
+    value<-unlist(value.xls)
+    concentration<-unlist(concentration.xls)
+    compound<-unlist( compound.xls)
     
-    #' Convert concentration to numeric.
-    #' We need to replace na with 0, so the
-    #' BLANK values dont get deleted in the last step.
+    
     concentration <- as.numeric(concentration)
     concentration[is.na(concentration)] <- 0
     concentration <- sapply(concentration, log10)
-    #' concentration[is.infinite(concentration)] <- 0
-    #' value <- sapply(value, data.divh)
+
     df <- data.frame(concentration, value, compound)
     df <- df[complete.cases(df), ]
     df$concentration[which(df$compound == "BLANK")] <- NA
