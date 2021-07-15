@@ -201,12 +201,9 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                       )
                     ),
                     
-                   
-                    
-                    
-                    tabPanel(
+                   tabPanel(
                       "Database",
-                      titlePanel("Upload and inspect data sets"),
+                        titlePanel("Upload and inspect data sets"),
                       sidebarLayout(
                         sidebarPanel(
                           textInput(
@@ -225,8 +222,8 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                             accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet "
                           ),
                           #br(),
-                         
-                          actionButton("upload", "Upload"),
+                          downloadButton('downloadData', 'Download data'),
+                         # actionButton("upload", "Upload"), ################
                           tags$hr(),
                           selectInput(
                             inputId = "inspect",
