@@ -1,8 +1,8 @@
 ## First specify the packages of interest
 packages = c("shiny", "ggplot2",
              "scales", "tidyverse","readxl")
-
-## Now load or install&load all
+    
+## Now load or install&loa        d all
 package.check <- lapply(
   packages,
   FUN = function(x) {

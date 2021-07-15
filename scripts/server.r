@@ -239,13 +239,15 @@ shinyServer(function(input, output, session) {
 
   dat_save<-eventReactive(input$upload, {
       runif(input$file)
-      data.save("../database",
+      outputDir <- "../DB_Test 2"
+      dir.create(file.path(outputDir), recursive = TRUE)#showWarnings = FALSE)
+      #dir.create(file.path('testdir2', 'testdir3'), recursive = TRUE)
+      data.save(outputDir,
               paste(input$filename, "dat", sep = "."),
               data.extract(input$file$datapath))
     })
   
   observe({
-  
     comp <- as.vector(unique(df()$"compound"))
     updateSelectInput(session, "compound",
                       choices = comp[!is.na(comp)])
@@ -281,15 +283,9 @@ shinyServer(function(input, output, session) {
       if (is.null(input$file) || is.null(input$filename)) {
         return()
       } else{
-       
         dat_save()
-    
-            
-      
-        
       }
-    
-  })
+    })
   
   
   
