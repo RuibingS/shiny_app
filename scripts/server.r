@@ -4,7 +4,7 @@ shinyServer(function(input, output, session) {
   
   df<- reactive({
     req(input$file1)
-    read.table(input$file1$datapath,sep = ",", header = TRUE)
+    data.extract(input$file1$datapath)
    
     })
   get.dat<-reactive({
@@ -22,9 +22,12 @@ shinyServer(function(input, output, session) {
       blank <- subset(dat,tolower(dat$compound)=="blank")
       blank.val <- blank$value
       if(sub_blank && length(blank) > 0){
-        blank.mean <- mean(blank.val)
-        dat$value <- dat$value - blank.mean
-      }
+          dat<-dat %>% 
+          group_by(concentration) %>% 
+          mutate(value=case_when(length(tolower(compound)=="blank")>0 ~ value-value[tolower(compound)=="blank"])) %>% 
+          data.frame()  
+        }
+      
       dat <- dat[dat$compound %in% compound.input,]
       dat$compound<-tolower(dat$compound)
       return(dat)
@@ -245,20 +248,67 @@ shinyServer(function(input, output, session) {
 #      data.save(outputDir,paste(input$filename, "dat", sep = "."),data.extract(input$file$datapath))
     
 #    })
-  
+  # create filename
+  fn_downloadname <- reactive({
+    
+    if(input$fformat=="png") filename <- paste0("plot",".png",sep="")
+    if(input$fformat=="tiff") filename <- paste0("plot",".tif",sep="")
+    if(input$fformat=="jpeg") filename <- paste0("plot",".jpg",sep="")
+    if(input$fformat=="pdf") filename <- paste0("plot",".pdf",sep="")
+    return(filename)
+  })  
+  # download function
+  fn_download <-function()
+  {
+    #df <- fn_data()
+    fheight <- input$fheight
+    fwidth <- input$fwidth
+    fres <- as.numeric(input$fres)
+    
+    if(input$fformat=="pdf") fheight <- round(fheight*0.3937,2)
+    if(input$fformat=="pdf") fwidth <- round(fwidth*0.3937,2)
+    
+    if(input$fformat=="png") png(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm")
+    if(input$fformat=="tiff") tiff(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",compression="lzw")
+    if(input$fformat=="jpeg") jpeg(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",quality=100)
+    if(input$fformat=="pdf") pdf(fn_downloadname(), height=fheight, width=fwidth)
+    render.plot()
+    dev.off()
+  }
 
   
+ 
   observe({
     comp <- as.vector(unique(df()$"compound"))
     updateSelectInput(session, "compound",
                       choices = comp[!is.na(comp)])
   })
+
   observe({
     if(input$Button>0){
       output$plot <-renderPlot(isolate(render.plot()))
+      
+     
       output$summary <-renderPrint(isolate(render.summary()))
       }
     })
+  
+  
+  observe({
+    if(input$Button>0){
+        output$plot <- renderPlot(
+          height = function() input$height,
+          width = function() input$width,
+          # fres <- as.numeric(input$fres),
+        {
+          render.plot()
+        }
+      )
+    }
+    })
+  
+  
+  
   
   observe({
   output$show <-renderDataTable(isolate(data.load("../db", input$inspect)), options = list(paging = TRUE, searching = FALSE)) #, options = list(paging = TRUE, searching = FALSE)
@@ -297,20 +347,41 @@ shinyServer(function(input, output, session) {
       }
     })
   
-  
-  
+  # download handler
   observe({
-
     output$download <- downloadHandler(
       filename = function() {
-        paste("plot", ".png", sep = "")
-      },
-      content = function(file) {
-        ggsave(file,render.plot())
+        paste("plot",input$fformat,sep= ".")},
+       content = function(file){
 
+        # open the format of file which needs to be downloaded ex: pdf, png etc. 
+        if (input$fformat== "png"){
+          png(file)
+        } else if (input$fformat== "pdf"){
+          pdf(file)
+        } else {
+          jpeg(file) 
+        }
+        #renderPlot(render.plot())
+        print(render.plot())
+         #ggsave(file,render.plot())
+        dev.off()
+      }
+     
+   )
+  })  
+ # observe({
 
-      })
- })
+ #   output$download <- downloadHandler(
+#      filename = function() {
+#        paste("plot", ".png", sep = "")
+#      },
+#      content = function(file) {
+#        ggsave(file,render.plot())
+#
+
+ #     })
+ #})
     
   
   

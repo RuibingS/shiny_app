@@ -73,8 +73,8 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                         sidebarPanel(
                           
                           # Input: Select a file ----
-                          fileInput("file1", "Choose CSV File",
-                                    accept = c("text/csv","text/comma-separated-values,text/plain",".csv")),
+                          fileInput("file1", "Choose File"
+                                    ),
                           tags$hr(),
                           
                      #     selectInput(
@@ -179,6 +179,11 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                  ))),
                           tags$hr(),
                           #br(),
+                          sliderInput("height", "height", min = 100, max = 500, value = 300),
+                          sliderInput("width", "width", min = 100, max = 500, value = 400),
+                          #sliderInput("res", "Res", min = 100, max = 300, value = 100),
+                          #selectInput("res", "Res", choices=c("100","200","300"), selected = "100"),
+                          radioButtons("fformat",label="File format",choices=c("png","tiff","jpeg","pdf"),inline=T),
                           downloadButton("download", "Download")
                          
                         ),
@@ -201,41 +206,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                       )
                     ),
                     
-                   tabPanel(
-                      "Database",
-                        titlePanel("Upload and inspect data sets"),
-                      sidebarLayout(
-                        sidebarPanel(
-                          textInput(
-                            inputId = "filename",
-                            label = "Choose file name:",
-                            value = "filename"
-                          ),
-                          textInput(
-                            inputId = "fileblank",
-                            label = "Name blank compound (if available):",
-                            value = "BLANK"
-                          ),
-                            fileInput(
-                            inputId = "file",
-                            label = "Choose spreadsheet file:",
-                            accept = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet "
-                          ),
-                          #br(),
-                          downloadButton('downloadData', 'Download data'),
-                         # actionButton("upload", "Upload"), ################
-                          tags$hr(),
-                          selectInput(
-                            inputId = "inspect",
-                            label = "Inspect data set:",
-                            data.list("../db"),
-                            multiple = FALSE,
-                            selectize = TRUE
-                          )
-                        ),
-                        mainPanel(dataTableOutput("show"))
-                      )
-                    ),
+
                     
                     tabPanel(
                       "Help",
