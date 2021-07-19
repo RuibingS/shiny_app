@@ -241,44 +241,6 @@ shinyServer(function(input, output, session) {
     return(summary)
   })
   
-
-# dat_save<-reactive({
-#     #runif(input$file)
-#     require(input$file)
-#      outputDir <- "DB_Test Local 2"
-#      dir.create(file.path(outputDir), recursive = TRUE)#showWarnings = FALSE)
-#      data.save(outputDir,paste(input$filename, "dat", sep = "."),data.extract(input$file$datapath))
-    
-#    })
-  # create filename
-  fn_downloadname <- reactive({
-    
-    if(input$fformat=="png") filename <- paste0("plot",".png",sep="")
-    if(input$fformat=="tiff") filename <- paste0("plot",".tif",sep="")
-    if(input$fformat=="jpeg") filename <- paste0("plot",".jpg",sep="")
-    if(input$fformat=="pdf") filename <- paste0("plot",".pdf",sep="")
-    return(filename)
-  })  
-  # download function
-  fn_download <-function()
-  {
-    #df <- fn_data()
-    fheight <- input$fheight
-    fwidth <- input$fwidth
-    fres <- as.numeric(input$fres)
-    
-    if(input$fformat=="pdf") fheight <- round(fheight*0.3937,2)
-    if(input$fformat=="pdf") fwidth <- round(fwidth*0.3937,2)
-    
-    if(input$fformat=="png") png(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm")
-    if(input$fformat=="tiff") tiff(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",compression="lzw")
-    if(input$fformat=="jpeg") jpeg(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",quality=100)
-    if(input$fformat=="pdf") pdf(fn_downloadname(), height=fheight, width=fwidth)
-    render.plot()
-    dev.off()
-  }
-
-  
  
   observe({
     comp <- as.vector(unique(df()$"compound"))
@@ -310,25 +272,10 @@ shinyServer(function(input, output, session) {
     })
   
   
-  
-  
   observe({
   output$show <-renderDataTable(isolate(data.load("../db", input$inspect)), options = list(paging = TRUE, searching = FALSE)) #, options = list(paging = TRUE, searching = FALSE)
   })
-  
-#  observe({
-#    if(input$upload>0){
-#      if (is.null(input$file) || is.null(input$filename)) {
-#         return()
-#       } else{
-#       data.save()
-     # updateSelectInput(session, "dataset", choices = data.list("../database"))
-      #updateSelectInput(session, "inspect",
-      #                  choices = data.list("../db"))
-      
-#          }
-#    }
-#  })
+
   
   
   observe({
@@ -372,18 +319,7 @@ shinyServer(function(input, output, session) {
      
    )
   })  
- # observe({
 
- #   output$download <- downloadHandler(
-#      filename = function() {
-#        paste("plot", ".png", sep = "")
-#      },
-#      content = function(file) {
-#        ggsave(file,render.plot())
-#
-
- #     })
- #})
     
   
   
