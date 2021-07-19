@@ -250,28 +250,12 @@ shinyServer(function(input, output, session) {
 
   observe({
     if(input$Button>0){
-      output$plot <-renderPlot(isolate(render.plot()))
-      
-     
+     # output$plot <-renderPlot(isolate(render.plot()))
       output$summary <-renderPrint(isolate(render.summary()))
       }
     })
   
-  
-  observe({
-    if(input$Button>0){
-        output$plot <- renderPlot(
-          height = function() input$height,
-          width = function() input$width,
-          # fres <- as.numeric(input$fres),
-        {
-          render.plot()
-        }
-      )
-    }
-    })
-  
-  
+   
   observe({
   output$show <-renderDataTable(isolate(data.load("../db", input$inspect)), options = list(paging = TRUE, searching = FALSE)) #, options = list(paging = TRUE, searching = FALSE)
   })
@@ -295,32 +279,68 @@ shinyServer(function(input, output, session) {
        
       }
     })
+  # create filename
+  fn_downloadname <- reactive({
+    
+    if(input$fformat=="png") filename <- paste0("plot",".png",sep="")
+    if(input$fformat=="tiff") filename <- paste0("plot",".tif",sep="")
+    if(input$fformat=="jpeg") filename <- paste0("plot",".jpg",sep="")
+    if(input$fformat=="pdf") filename <- paste0("plot",".pdf",sep="")
+    return(filename)
+  })
+  
+  observe({
+    if(input$Button>0){
+   output$plot <- renderImage({
+    
+    #df <- fn_data()
+    fheight <- input$fheight
+    fwidth <- input$fwidth
+    fres <- as.numeric(input$fres)
+    
+    png(paste0("plot",".png",sep=""), height=fheight, width=fwidth, res=fres, units="cm")
+    print(render.plot())
+    dev.off()
+    
+    return(list(src = paste0("plot",".png",sep=""),
+                contentType = "image/png",
+                width = round((input$fwidth*as.numeric(input$fres))/2.54, 0),
+                height = round((input$fheight*as.numeric(input$fres))/2.54, 0),
+                alt = "plot"))
+  },deleteFile=TRUE)
+    }
+  })    
+ 
+  
+   # download function
+  fn_download <- function()
+  {
+    
+    
+    fheight <- input$fheight
+    fwidth <- input$fwidth
+    fres <- as.numeric(input$fres)
+    
+    if(input$fformat=="pdf") fheight <- round(fheight*0.3937,2)
+    if(input$fformat=="pdf") fwidth <- round(fwidth*0.3937,2)
+    
+    if(input$fformat=="png") png(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm")
+    if(input$fformat=="tiff") tiff(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",compression="lzw")
+    if(input$fformat=="jpeg") jpeg(fn_downloadname(), height=fheight, width=fwidth, res=fres, units="cm",quality=100)
+    if(input$fformat=="pdf") pdf(fn_downloadname(), height=fheight, width=fwidth)
+    print(render.plot())
+    dev.off()
+  }
   
   # download handler
-  observe({
-    output$download <- downloadHandler(
-      filename = function() {
-        paste("plot",input$fformat,sep= ".")},
-       content = function(file){
+  output$download <- downloadHandler(
+    filename = function() {
+              paste("plot",input$fformat,sep= ".")},
+    content = function(file) {
+      fn_download()
+      file.copy(fn_downloadname(), file, overwrite=T)
+    }
+  )
 
-        # open the format of file which needs to be downloaded ex: pdf, png etc. 
-        if (input$fformat== "png"){
-          png(file)
-        } else if (input$fformat== "pdf"){
-          pdf(file)
-        } else {
-          jpeg(file) 
-        }
-        #renderPlot(render.plot())
-        print(render.plot())
-         #ggsave(file,render.plot())
-        dev.off()
-      }
-     
-   )
-  })  
 
-    
-  
-  
 })

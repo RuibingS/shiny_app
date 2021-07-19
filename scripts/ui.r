@@ -117,8 +117,11 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                             label = strong("Substract blank compound (if available)"),
                             value = FALSE
                           ),
-                          tags$hr(),
-                          actionButton("Button", "Run"),
+                          #tags$hr(),
+                          div(style="display:inline-block;margin-left: 70%;padding-bottom: 10px;",
+                          actionButton("Button", "Run")),
+                          
+                          #tags$hr(),
                           textInput(inputId = "x_axis",
                                     label = "x axis",
                                     value = paste0("conc [","\u03BC", "M]")),
@@ -178,12 +181,11 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                    value = FALSE
                                  ))),
                           tags$hr(),
-                          #br(),
-                          sliderInput("height", "height", min = 100, max = 500, value = 300),
-                          sliderInput("width", "width", min = 100, max = 500, value = 400),
-                          #sliderInput("res", "Res", min = 100, max = 300, value = 100),
-                          #selectInput("res", "Res", choices=c("100","200","300"), selected = "100"),
-                          radioButtons("fformat",label="File format",choices=c("png","tiff","jpeg","pdf"),inline=T),
+                          
+                          numericInput("fheight", "Height (cm)", min=2, max=15, step=1, value = 10),
+                          numericInput("fwidth", "Width (cm)", min=2, max=15, step=1, value = 12),
+                          selectInput("fres", "Res", choices=c("100","200","300"), selected = "100"),
+                          selectInput("fformat", "File type", choices=c("png","tiff","jpeg","pdf"), selected = "png", multiple = FALSE, selectize = TRUE),
                           downloadButton("download", "Download")
                          
                         ),
