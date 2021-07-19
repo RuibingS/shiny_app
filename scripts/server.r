@@ -198,7 +198,9 @@ shinyServer(function(input, output, session) {
     grid.x <- scale_y_continuous(name = input$y_axis)#"growth OD600") 
     grid.y <- scale_x_continuous(name = input$x_axis, labels = math_format(10^.x))  #expression(paste("conc [", mu, "M]"))
     
-    return(cplot + plot.title + center + annotation_logticks() + grid.x + grid.y)
+    return(cplot + plot.title + center + annotation_logticks() + grid.x + grid.y+ 
+             theme(panel.background = element_blank(),panel.border = element_blank())
+           )
     ##########################
   })
   render.summary <- reactive({
