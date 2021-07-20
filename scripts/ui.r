@@ -112,6 +112,9 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                             )
                           ),
                           tags$hr(),
+                          textInput(inputId = "fileblank",
+                          label = "Name blank compound (if available):",
+                          value = "BLANK"),
                           checkboxInput(
                             inputId = "sub_blank",
                             label = strong("Substract blank compound (if available)"),

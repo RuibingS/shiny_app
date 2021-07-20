@@ -19,12 +19,12 @@ shinyServer(function(input, output, session) {
       dat <- df()
       dat<-na.omit(dat)
       dat <- subset(dat,is.finite(concentration))
-      blank <- subset(dat,tolower(dat$compound)=="blank")
+      blank <- subset(dat,tolower(dat$compound)==tolower(input$fileblank))
       blank.val <- blank$value
       if(sub_blank && length(blank) > 0){
           dat<-dat %>% 
           group_by(concentration) %>% 
-          mutate(value=case_when(length(tolower(compound)=="blank")>0 ~ value-value[tolower(compound)=="blank"])) %>% 
+          mutate(value=case_when(length(tolower(compound)==tolower(input$fileblank))>0 ~ value-value[tolower(compound)==tolower(input$fileblank)])) %>% 
           data.frame()  
         }
       
@@ -250,7 +250,7 @@ shinyServer(function(input, output, session) {
 
   observe({
     if(input$Button>0){
-     # output$plot <-renderPlot(isolate(render.plot()))
+      output$plot <-renderPlot(isolate(render.plot()))
       output$summary <-renderPrint(isolate(render.summary()))
       }
     })
@@ -289,27 +289,7 @@ shinyServer(function(input, output, session) {
     return(filename)
   })
   
-  observe({
-    if(input$Button>0){
-   output$plot <- renderImage({
     
-    #df <- fn_data()
-    fheight <- input$fheight
-    fwidth <- input$fwidth
-    fres <- as.numeric(input$fres)
-    
-    png(paste0("plot",".png",sep=""), height=fheight, width=fwidth, res=fres, units="cm")
-    print(render.plot())
-    dev.off()
-    
-    return(list(src = paste0("plot",".png",sep=""),
-                contentType = "image/png",
-                width = round((input$fwidth*as.numeric(input$fres))/2.54, 0),
-                height = round((input$fheight*as.numeric(input$fres))/2.54, 0),
-                alt = "plot"))
-  },deleteFile=TRUE)
-    }
-  })    
  
   
    # download function
